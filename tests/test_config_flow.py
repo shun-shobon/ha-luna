@@ -12,8 +12,8 @@ from custom_components.luna.const import DOMAIN
 @pytest.mark.parametrize(
     ("entered", "stored"),
     [
-        ("http://192.168.0.103:3000", "http://192.168.0.103:3000"),
-        ("  http://192.168.0.103:3000/  ", "http://192.168.0.103:3000"),
+        ("http://luna.local:3000", "http://luna.local:3000"),
+        ("  http://luna.local:3000/  ", "http://luna.local:3000"),
         ("https://luna.example/base//", "https://luna.example/base"),
     ],
 )
@@ -39,14 +39,14 @@ async def test_user_step_creates_entry_with_normalized_url(
 @pytest.mark.parametrize(
     "entered",
     [
-        "192.168.0.103:3000",
+        "luna.local:3000",
         "localhost:3000",
-        "ftp://192.168.0.103",
+        "ftp://luna.local",
         "http://",
         "http:///path",
-        "http://192.168.0.103:99999",
-        "http://192.168.0.103:3000/?token=x",
-        "http://192.168.0.103:3000/#top",
+        "http://luna.local:99999",
+        "http://luna.local:3000/?token=x",
+        "http://luna.local:3000/#top",
         "not a url",
         "",
     ],
@@ -66,7 +66,7 @@ async def test_user_step_rejects_invalid_url(hass: HomeAssistant, entered: str) 
     assert result["errors"] == {CONF_URL: "invalid_url"}
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_URL: "http://192.168.0.103:3000"}
+        result["flow_id"], {CONF_URL: "http://luna.local:3000"}
     )
     assert result["type"] is data_entry_flow.FlowResultType.CREATE_ENTRY
 
@@ -74,7 +74,7 @@ async def test_user_step_rejects_invalid_url(hass: HomeAssistant, entered: str) 
 async def test_user_step_aborts_when_already_configured(hass: HomeAssistant) -> None:
     """Only one Luna entry can exist."""
     MockConfigEntry(
-        domain=DOMAIN, title="Luna", data={CONF_URL: "http://192.168.0.103:3000"}
+        domain=DOMAIN, title="Luna", data={CONF_URL: "http://luna.local:3000"}
     ).add_to_hass(hass)
 
     result = await hass.config_entries.flow.async_init(

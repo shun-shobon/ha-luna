@@ -13,7 +13,7 @@ from custom_components.luna.const import DOMAIN
 async def test_setup_and_unload_entry(hass: HomeAssistant) -> None:
     """The entry provides one all-language agent until it is unloaded."""
     entry = MockConfigEntry(
-        domain=DOMAIN, title="Luna", data={CONF_URL: "http://192.168.0.103:3000"}
+        domain=DOMAIN, title="Luna", data={CONF_URL: "http://luna.local:3000"}
     )
     entry.add_to_hass(hass)
 

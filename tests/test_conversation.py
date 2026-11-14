@@ -18,7 +18,7 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import (
 
 from custom_components.luna.const import DOMAIN
 
-LUNA_URL = "http://192.168.0.103:3000"
+LUNA_URL = "http://luna.local:3000"
 ENDPOINT = f"{LUNA_URL}/home-assistant/conversation"
 AGENT_ID = "conversation.luna"
 

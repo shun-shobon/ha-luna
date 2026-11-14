@@ -32,7 +32,7 @@ Home Assistant 2026.10以降が必要です。
 1. 上のボタンを開くか、HACSのCustom repositoriesへ `https://github.com/shun-shobon/ha-luna` をIntegrationとして追加します。
 2. HACSから「Luna」をインストールします。
 3. Home Assistantを再起動します。
-4. 「設定」、「デバイスとサービス」、「統合を追加」、「Luna」の順に開き、LunaのURL（例: `http://192.168.0.103:3000`）を入力します。
+4. 「設定」、「デバイスとサービス」、「統合を追加」、「Luna」の順に開き、LunaのURL（例: `http://luna.local:3000`）を入力します。
 
 追加できるLunaは1つだけです。設定時にLunaへの接続確認は行いません。
 

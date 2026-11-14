@@ -1,0 +1,23 @@
+{
+  "title": "Luna",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lunaに接続",
+        "description": "LunaのHTTP APIのURLを入力してください。Home AssistantはAssistのリクエストを認証なしでこのURLへ送信します。",
+        "data": {
+          "url": "URL"
+        },
+        "data_description": {
+          "url": "例: http://192.168.0.103:3000"
+        }
+      }
+    },
+    "error": {
+      "invalid_url": "ホストを含むhttpまたはhttpsのURLを、クエリやフラグメントなしで入力してください。"
+    },
+    "abort": {
+      "single_instance_allowed": "Lunaは設定済みです。追加できるLunaは1つだけです。"
+    }
+  }
+}

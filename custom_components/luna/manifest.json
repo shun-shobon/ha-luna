@@ -1,0 +1,14 @@
+{
+  "domain": "luna",
+  "name": "Luna",
+  "codeowners": ["@shun-shobon"],
+  "config_flow": true,
+  "dependencies": ["conversation"],
+  "documentation": "https://github.com/shun-shobon/ha-luna",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/shun-shobon/ha-luna/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.1.0"
+}

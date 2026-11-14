@@ -18,13 +18,26 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-_ERROR_SPEECH = {
+_ERROR_SPEECH_EN = {
     LunaErrorReason.TIMEOUT: "Luna did not reply in time.",
     LunaErrorReason.CANNOT_CONNECT: "Could not connect to Luna.",
     LunaErrorReason.UNAVAILABLE: "Luna is shutting down.",
     LunaErrorReason.EXECUTION_FAILED: "Luna failed to process the request.",
     LunaErrorReason.INVALID_RESPONSE: "Luna returned an invalid response.",
 }
+_ERROR_SPEECH_JA = {
+    LunaErrorReason.TIMEOUT: "ルナから時間内に返事がありませんでした。",
+    LunaErrorReason.CANNOT_CONNECT: "ルナに接続できませんでした。",
+    LunaErrorReason.UNAVAILABLE: "ルナは停止処理中です。",
+    LunaErrorReason.EXECUTION_FAILED: "ルナが処理に失敗しました。",
+    LunaErrorReason.INVALID_RESPONSE: "ルナから不正な応答が返りました。",
+}
+
+
+def _error_speech(reason: LunaErrorReason, language: str) -> str:
+    if language.split("-", 1)[0].lower() == "ja":
+        return _ERROR_SPEECH_JA[reason]
+    return _ERROR_SPEECH_EN[reason]
 
 
 async def async_setup_entry(
@@ -41,6 +54,7 @@ class LunaConversationEntity(conversation.ConversationEntity):
 
     _attr_has_entity_name = True
     _attr_name = None
+    _attr_supported_features = conversation.ConversationEntityFeature.CONTROL
 
     def __init__(self, entry: LunaConfigEntry) -> None:
         """Initialize the entity."""
@@ -73,7 +87,8 @@ class LunaConversationEntity(conversation.ConversationEntity):
         except LunaError as err:
             _LOGGER.error("Luna conversation request failed: %s", err)
             response.async_set_error(
-                intent.IntentResponseErrorCode.UNKNOWN, _ERROR_SPEECH[err.reason]
+                intent.IntentResponseErrorCode.UNKNOWN,
+                _error_speech(err.reason, user_input.language),
             )
             return conversation.ConversationResult(
                 response=response, conversation_id=chat_log.conversation_id

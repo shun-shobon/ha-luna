@@ -41,13 +41,14 @@ async def converse(
     context: Context | None = None,
     device_id: str | None = None,
     satellite_id: str | None = None,
+    language: str = "ja",
 ) -> conversation.ConversationResult:
     return await conversation.async_converse(
         hass,
         "電気消して",
         None,
         context or Context(),
-        language="ja",
+        language=language,
         agent_id=AGENT_ID,
         device_id=device_id,
         satellite_id=satellite_id,
@@ -148,61 +149,63 @@ async def test_follow_up_turn_reuses_conversation_id(
     ("mock", "speech"),
     [
         pytest.param(
-            {"exc": TimeoutError()}, "Luna did not reply in time.", id="timeout"
+            {"exc": TimeoutError()},
+            "ルナから時間内に返事がありませんでした。",
+            id="timeout",
         ),
         pytest.param(
             {"exc": ClientConnectionError()},
-            "Could not connect to Luna.",
+            "ルナに接続できませんでした。",
             id="cannot_connect",
         ),
         pytest.param(
             {"status": 503, "json": {"error": "unavailable"}},
-            "Luna is shutting down.",
+            "ルナは停止処理中です。",
             id="unavailable",
         ),
         pytest.param(
             {"status": 500, "json": {"error": "execution_failed"}},
-            "Luna failed to process the request.",
+            "ルナが処理に失敗しました。",
             id="execution_failed",
         ),
         pytest.param(
             {"status": 400, "json": {"error": "invalid_request"}},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="invalid_request",
         ),
         pytest.param(
             {"status": 415, "text": ""},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="unsupported_media_type",
         ),
         pytest.param(
             {"text": "<html>not json</html>"},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="malformed_json",
         ),
         pytest.param(
             {"json": ["speech"]},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="not_an_object",
         ),
         pytest.param(
             {"json": {"continue_conversation": False}},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="missing_speech",
         ),
         pytest.param(
             {"json": {"speech": "消したよ"}},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="missing_continue_conversation",
         ),
         pytest.param(
             {"json": {"speech": 1, "continue_conversation": False}},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="speech_not_string",
         ),
         pytest.param(
             {"json": {"speech": "消したよ", "continue_conversation": "false"}},
-            "Luna returned an invalid response.",
+            "ルナから不正な応答が返りました。",
             id="continue_conversation_not_bool",
         ),
     ],
@@ -225,6 +228,28 @@ async def test_failure_returns_error_response(
     assert result.continue_conversation is False
     assert result.conversation_id == sent_body(aioclient_mock)["conversation_id"]
     assert "Luna conversation request failed" in caplog.text
+
+
+async def test_failure_speech_is_english_for_other_languages(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Languages other than Japanese get the English error speech."""
+    aioclient_mock.post(ENDPOINT, exc=TimeoutError())
+
+    result = await converse(hass, language="en")
+
+    assert result.response.speech["plain"]["speech"] == "Luna did not reply in time."
+
+
+async def test_entity_supports_control(hass: HomeAssistant) -> None:
+    """The prefer-local-intents option is offered for this agent."""
+    state = hass.states.get(AGENT_ID)
+
+    assert state is not None
+    assert (
+        state.attributes["supported_features"]
+        == conversation.ConversationEntityFeature.CONTROL
+    )
 
 
 async def test_request_includes_device_area_and_user_names(
